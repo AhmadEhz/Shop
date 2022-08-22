@@ -1,7 +1,5 @@
 package shop.repository;
 
-import java.sql.SQLException;
-
 public interface BaseRepository<T, E> {
     T read(E e);
 
