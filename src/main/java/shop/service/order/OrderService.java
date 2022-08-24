@@ -12,4 +12,5 @@ public interface OrderService {
     void setStatus(Order order, OrderStatus orderStatus);
     void setTotalPrice(Order order, int newPrice);
     Order loadPendingOrder(long customerId);
+    int numberOfProduct (long id);
 }

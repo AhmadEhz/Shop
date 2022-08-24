@@ -5,12 +5,13 @@ public class Product {
     private String name;
     private String category;
     private String type;
-
     private int quantity;
     private boolean isExist;
     private int price;
 
-    public Product() {}
+    public Product() {
+    }
+
     public Product(long id, String name, String category) {
         this.id = id;
         this.name = name;
@@ -51,6 +52,14 @@ public class Product {
         this.category = category;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public int getPrice() {
         return price;
     }
@@ -73,5 +82,11 @@ public class Product {
 
     public void setExist(boolean exist) {
         isExist = exist;
+    }
+
+    @Override
+    public String toString() {
+        return id + "- " + name + " | Category: " + category + '\n' +
+               "Type: " + type + " | Quantity: " + quantity + " --> " + price;
     }
 }

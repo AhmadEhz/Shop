@@ -12,8 +12,8 @@ import shop.service.productOrder.ProductOrderServiceImpl;
 import java.util.List;
 
 public class OrderServiceImpl implements OrderService {
-    private OrderRepository orderRepository = new OrderRepositoryImpl();
-    private ProductOrderService productOrderService = new ProductOrderServiceImpl();
+    private final OrderRepository orderRepository = new OrderRepositoryImpl();
+    private final ProductOrderService productOrderService = new ProductOrderServiceImpl();
 
     public Order load(long id) {
         return orderRepository.read(id);
@@ -46,7 +46,11 @@ public class OrderServiceImpl implements OrderService {
     }
 
     public Order loadPendingOrder(long customerId) {
-        return orderRepository.readPendingOrder(customerId);
+        Order order = orderRepository.readPendingOrder(customerId);
+            order.setProducts(productOrderService.loadAll(order.getId()));
+
+
+        return order;
     }
 
     private boolean pendingOrderIsExist(long customerId) {
@@ -56,5 +60,8 @@ public class OrderServiceImpl implements OrderService {
         } catch (RuntimeException e) {
             return false;
         }
+    }
+    public int numberOfProduct (long id) {
+        return orderRepository.read(id).getProductNumbers();
     }
 }

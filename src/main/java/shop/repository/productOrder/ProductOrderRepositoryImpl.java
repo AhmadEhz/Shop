@@ -11,7 +11,6 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class ProductOrderRepositoryImpl implements ProductOrderRepository {
-    private long lastGeneratedId;
 
     @Override
     public ProductOrder read(ProductOrder productOrder) {
@@ -47,10 +46,10 @@ public class ProductOrderRepositoryImpl implements ProductOrderRepository {
             ps.execute();
             ResultSet rs = ps.getGeneratedKeys();
             rs.next();
-            lastGeneratedId = rs.getLong(1);
+            productOrder.setId(rs.getLong(1));
             rs.close();
         } catch (SQLException e) {
-            throw new RuntimeException("can't add to product_order");
+            throw new NotFoundException("This product not found!");
         }
     }
 
@@ -120,8 +119,6 @@ public class ProductOrderRepositoryImpl implements ProductOrderRepository {
         } catch (SQLException e) {
             throw new NotFoundException("this order not found.");
         }
-        if (products.isEmpty())
-            throw new NotFoundException("Not found any product in this order!");
         return products;
     }
 
@@ -138,7 +135,4 @@ public class ProductOrderRepositoryImpl implements ProductOrderRepository {
 
     }
 
-    public long getLastGeneratedId() {
-        return lastGeneratedId;
-    }
 }

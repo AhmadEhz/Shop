@@ -10,9 +10,6 @@ import shop.service.order.OrderServiceImpl;
 public class CustomerServiceImpl implements CustomerService {
     CustomerRepository customerRepository = new CustomerRepositoryImpl();
     OrderService orderService = new OrderServiceImpl();
-    /*public boolean checkUsername (String username) {
-        return customerRepository.checkUsername(username);
-    }*/
     @Override
     public Customer login(Customer customer) {
         return customerRepository.read(customer);

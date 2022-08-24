@@ -9,11 +9,15 @@ public class Order {
     private int totalPrice;
     private int productNumbers;
     private long customerId;
-    public Order () {}
-    public Order (long customerId) {
+
+    public Order() {
+    }
+
+    public Order(long customerId) {
         this.customerId = customerId;
     }
-    public Order (long id, int totalPrice,OrderStatus status,int productNumbers, long customerId) {
+
+    public Order(long id, int totalPrice, OrderStatus status, int productNumbers, long customerId) {
         this.id = id;
         this.totalPrice = totalPrice;
         this.status = status;
@@ -67,5 +71,17 @@ public class Order {
 
     public void setStatus(OrderStatus status) {
         this.status = status;
+    }
+    public boolean addProduct(ProductOrder productOrder) {
+       return products.add(productOrder);
+    }
+    @Override
+    public String toString() {
+        return id +
+               "- Status: " + status + "\n" +
+               "- TotalPrice: " + totalPrice +
+               "Number: " + productNumbers +
+               "Products:\n" + products;
+
     }
 }

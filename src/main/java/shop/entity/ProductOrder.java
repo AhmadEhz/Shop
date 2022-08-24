@@ -5,6 +5,7 @@ public class ProductOrder {
     private long id;
     private long orderId;
     private long productId;
+    private String name;
     private String category;
     private String type;
     private int count;
@@ -12,6 +13,7 @@ public class ProductOrder {
 
     public ProductOrder() {
     }
+
     public ProductOrder(long id) {
         this.id = id;
     }
@@ -25,6 +27,16 @@ public class ProductOrder {
         this.id = id;
         this.orderId = orderId;
         this.productId = productId;
+        this.category = category;
+        this.type = type;
+        this.count = count;
+        this.price = price;
+    }
+
+    public ProductOrder(long orderId, long productId, String name, String category, String type, int count, int price) {
+        this.orderId = orderId;
+        this.productId = productId;
+        this.name = name;
         this.category = category;
         this.type = type;
         this.count = count;
@@ -53,6 +65,14 @@ public class ProductOrder {
 
     public void setProductId(long productId) {
         this.productId = productId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getPrice() {
@@ -85,6 +105,12 @@ public class ProductOrder {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    @Override
+    public String toString() {
+        return id + "- " + name + " | Category: " + category + '\n' +
+               "Type: " + type + " | Number: " + count + " --> " + price;
     }
 }
 
