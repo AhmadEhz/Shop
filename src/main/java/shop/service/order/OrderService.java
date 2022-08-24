@@ -1,16 +1,15 @@
 package shop.service.order;
 
 import shop.entity.Order;
+import shop.entity.OrderList;
 import shop.entity.OrderStatus;
-
-import java.util.List;
 
 public interface OrderService {
     Order load(long id);
-    List<Order> loadAll(long customerId);
-    void add(Order order);
-    void delete (Order order);
+    OrderList loadAll(long customerId);
+    void add(long customerId);
+    void clear(Order order);
     void setStatus(Order order, OrderStatus orderStatus);
     void setTotalPrice(Order order, int newPrice);
-    long getLastGeneratedId();
+    Order loadPendingOrder(long customerId);
 }

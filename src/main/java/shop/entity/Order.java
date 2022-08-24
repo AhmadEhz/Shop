@@ -4,14 +4,20 @@ import java.util.List;
 
 public class Order {
     private long id;
-    private List<Product> products;
+    private ProductOrderList products;
     private OrderStatus status;
     private int totalPrice;
+    private int productNumbers;
     private long customerId;
     public Order () {}
-    public Order (long id, int totalPrice, long customerId) {
+    public Order (long customerId) {
+        this.customerId = customerId;
+    }
+    public Order (long id, int totalPrice,OrderStatus status,int productNumbers, long customerId) {
         this.id = id;
         this.totalPrice = totalPrice;
+        this.status = status;
+        this.productNumbers = productNumbers;
         this.customerId = customerId;
     }
 
@@ -23,11 +29,11 @@ public class Order {
         this.id = id;
     }
 
-    public List<Product> getProducts() {
+    public ProductOrderList getProducts() {
         return products;
     }
 
-    public void setProducts(List<Product> products) {
+    public void setProducts(ProductOrderList products) {
         this.products = products;
     }
 
@@ -49,6 +55,14 @@ public class Order {
 
     public OrderStatus getStatus() {
         return status;
+    }
+
+    public int getProductNumbers() {
+        return productNumbers;
+    }
+
+    public void setProductNumbers(int productNumbers) {
+        this.productNumbers = productNumbers;
     }
 
     public void setStatus(OrderStatus status) {

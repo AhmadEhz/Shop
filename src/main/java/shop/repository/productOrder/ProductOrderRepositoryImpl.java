@@ -75,14 +75,29 @@ public class ProductOrderRepositoryImpl implements ProductOrderRepository {
     public void delete(ProductOrder productOrder) {
         String query = """
                 delete from product_order
-                where id =? and order_id = ?
+                where id =? and order_id = ? and product_id = ?
                 """;
         try (PreparedStatement ps = DbConfig.getConnection().prepareStatement(query)) {
             ps.setLong(1, productOrder.getId());
             ps.setLong(2, productOrder.getOrderId());
+            ps.setLong(3,productOrder.getProductId());
             ps.execute();
         } catch (SQLException e) {
-            throw new RuntimeException("Can't delete from product_order", e.getCause());
+            throw new RuntimeException("Can't delete from product_order", e);
+        }
+    }
+    @Override
+    public void deleteAll(long orderId) {
+        String query = """
+                delete from product_order
+                where order_id = ?
+                """;
+        try (PreparedStatement ps = DbConfig.getConnection().prepareStatement(query)) {
+            ps.setLong(1,orderId);
+            ps.execute();
+        }
+        catch (SQLException e) {
+            throw new RuntimeException("Can't delete products of this order");
         }
     }
 

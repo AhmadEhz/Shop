@@ -11,4 +11,5 @@ public interface ProductOrderRepository extends BaseRepository<ProductOrder, Pro
 
     ProductOrderList readAll(long orderId);
     long getLastGeneratedId();
+    void deleteAll(long orderId);
 }

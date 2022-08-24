@@ -2,6 +2,7 @@ package shop.repository.customer;
 
 import shop.entity.Customer;
 import shop.exception.NotFoundException;
+import shop.exception.PermissionDeniedException;
 import shop.util.DbConfig;
 
 import java.sql.PreparedStatement;
@@ -21,6 +22,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
             ps.setString(1, customer.getUsername());
             ps.setString(2, customer.getPassword());
             ResultSet rs = ps.executeQuery();
+            rs.next();
             customer.setId(rs.getLong("id"));
             customer.setName(rs.getString("name"));
             rs.close();
@@ -42,7 +44,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
             ps.setString(3, customer.getPassword());
             ps.execute();
         } catch (SQLException e) {
-            throw new RuntimeException("Can't create customer.");
+            throw new PermissionDeniedException("This username is already used!");
         }
     }
 
@@ -78,7 +80,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
         }
     }
 
-    public boolean checkUsername(String username) {
+ /*   public boolean checkUsername(String username) {
         String query = """
                 select id from customer
                 where username = ?
@@ -90,5 +92,5 @@ public class CustomerRepositoryImpl implements CustomerRepository {
         } catch (SQLException e) {
             throw new RuntimeException("Can't read from Costumer", e.getCause());
         }
-    }
+    }*/
 }

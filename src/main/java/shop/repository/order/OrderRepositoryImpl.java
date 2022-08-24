@@ -1,6 +1,8 @@
 package shop.repository.order;
 
 import shop.entity.Order;
+import shop.entity.OrderList;
+import shop.entity.OrderStatus;
 import shop.exception.NotFoundException;
 import shop.util.DbConfig;
 
@@ -8,10 +10,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.List;
 
 public class OrderRepositoryImpl implements OrderRepository {
-    private long lastGeneratedId;
 
     @Override
     public Order read(Long id) {
@@ -24,24 +24,22 @@ public class OrderRepositoryImpl implements OrderRepository {
             ResultSet rs = ps.executeQuery();
             return getOrder(rs);
         } catch (SQLException e) {
-            throw new NotFoundException("Order not found",e);
+            throw new NotFoundException("Order not found");
         }
     }
 
     @Override
-    public void create(Order order) {
+    public void create(Order order) {// If customer have a pending order, this method not executed (Checked in OrderService)
         String query = """
-                insert into orders (total_price, status, customer_id)
-                values (?,? :: order_status,?)
+                insert into orders (customer_id)
+                values (?)
                 """;
         try (PreparedStatement ps = DbConfig.getConnection().prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setInt(1, order.getTotalPrice());
-            ps.setString(2, order.getStatus().name());
-            ps.setLong(3, order.getCustomerId());
+            ps.setLong(1, order.getCustomerId());
             ps.execute();
             ResultSet generatedKey = ps.getGeneratedKeys();
             generatedKey.next();
-            lastGeneratedId = generatedKey.getLong(1);
+            order.setId(generatedKey.getLong("id"));
             ps.close();
             generatedKey.close();
         } catch (SQLException e) {
@@ -52,7 +50,7 @@ public class OrderRepositoryImpl implements OrderRepository {
     @Override
     public void update(Order order) {
         String query = """
-                update orders 
+                update orders
                 set status = ? :: order_status, total_price = ?
                 where id = ? and customer_id = ?;
                 """;
@@ -75,7 +73,7 @@ public class OrderRepositoryImpl implements OrderRepository {
                 """;
         try (PreparedStatement ps = DbConfig.getConnection().prepareStatement(query)) {
             ps.setLong(1, order.getId());
-            ps.setLong(2,order.getCustomerId());
+            ps.setLong(2, order.getCustomerId());
             ps.execute();
         } catch (SQLException e) {
             throw new RuntimeException("Can't delete order");
@@ -83,17 +81,46 @@ public class OrderRepositoryImpl implements OrderRepository {
     }
 
     @Override
-    public List<Order> readAll(long CustomerId) {
-        return null;
+    public OrderList readAll(long customerId) {//Only read prescriptions that finalized
+        String query = """
+                select * from orders
+                where customer_id = ? and status != 'PENDING' ;
+                """;
+        OrderList orders = new OrderList();
+        try (PreparedStatement ps = DbConfig.getConnection().prepareStatement(query)) {
+            ps.setLong(1, customerId);
+            ResultSet rs = ps.executeQuery();
+                while (rs.next())
+                    orders.add(getOrder(rs));
+        } catch (SQLException e) {
+        throw new NotFoundException("You have not any finalized order!");
+        }
+        return orders;
+    }
+    @Override
+    public Order readPendingOrder(long customerId) { //Each customer have a pending order.
+        String query = """
+                select * from orders
+                where customer_id = ? and status = 'PENDING'
+                """;
+        try (PreparedStatement ps = DbConfig.getConnection().prepareStatement(query)) {
+            ps.setLong(1,customerId);
+            ResultSet rs = ps.executeQuery();
+            rs.next();
+            Order order = getOrder(rs);
+            ps.close();
+            return order;
+        }
+        catch (SQLException e) {
+            throw new RuntimeException("Can't read pending order!");
+        }
     }
 
     private Order getOrder(ResultSet rs) throws SQLException {
         return new Order(rs.getLong("id"),
                 rs.getInt("total_price"),
+                OrderStatus.valueOf(rs.getString("status")),
+                rs.getInt("product_numbers"),
                 rs.getLong("customer_id"));
-    }
-
-    public long getLastGeneratedId() {
-        return lastGeneratedId;
     }
 }

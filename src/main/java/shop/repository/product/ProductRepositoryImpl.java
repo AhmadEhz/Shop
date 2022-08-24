@@ -8,8 +8,6 @@ import shop.util.DbConfig;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ProductRepositoryImpl implements ProductRepository {
 
@@ -23,12 +21,11 @@ public class ProductRepositoryImpl implements ProductRepository {
         try (PreparedStatement ps = DbConfig.getConnection().prepareStatement(query)) {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
-            if (rs.next())
-                product = setProduct(rs);
-            else throw new NotFoundException("This product not found!");
+            rs.next();
+            product = getProduct(rs);
 
         } catch (SQLException e) {
-            throw new RuntimeException("can't read from database", e.getCause());
+            throw new NotFoundException("This product not found!");
         }
         return product;
     }
@@ -57,19 +54,19 @@ public class ProductRepositoryImpl implements ProductRepository {
         try (PreparedStatement ps = DbConfig.getConnection().prepareStatement(query)) {
             ResultSet rs = ps.executeQuery();
             while (rs.next())
-                products.add(setProduct(rs));
+                products.add(getProduct(rs));
 
             rs.close();
-            if(products.isEmpty())
+            if (products.isEmpty())
                 throw new NotFoundException("Not found any product!");
             return products;
         } catch (SQLException e) {
-            throw new RuntimeException("Can't read from product_order!",e.getCause());
+            throw new RuntimeException("Can't read from product_order!", e.getCause());
         }
     }
 
 
-    private Product setProduct(ResultSet rs) throws SQLException {
+    private Product getProduct(ResultSet rs) throws SQLException {
         return new Product(rs.getLong("id"),
                 rs.getString("name"),
                 rs.getString("category"),
