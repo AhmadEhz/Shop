@@ -1,22 +1,36 @@
 package shop.repository.productOrder;
 
-import shop.entity.Product;
 import shop.entity.ProductOrder;
+import shop.entity.ProductOrderList;
+import shop.exception.NotFoundException;
 import shop.util.DbConfig;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ProductOrderRepositoryImpl implements ProductOrderRepository {
     private long lastGeneratedId;
 
     @Override
-    public ProductOrder read(Long id) {
-        return null;
+    public ProductOrder read(ProductOrder productOrder) {
+        String query = """
+                select pro_ord.id, order_id, product_id, category, type, count, pro.price, pro_ord.price from product_order as pro_ord
+                join product pro on pro_ord.product_id = pro.id
+                join orders ord on pro_ord.order_id = ord.id
+                where order_id = ? and pro.id = ?;
+                """;
+        try (PreparedStatement ps = DbConfig.getConnection().prepareStatement(query)) {
+            ps.setLong(1, productOrder.getOrderId());
+            ps.setLong(2, productOrder.getProductId());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next())
+                return getProductOrder(rs);
+             else throw new NotFoundException("This product not found!");
+        } catch (SQLException e) {
+            throw new RuntimeException("Can't read from product_order", e.getCause());
+        }
     }
 
     @Override
@@ -73,34 +87,40 @@ public class ProductOrderRepositoryImpl implements ProductOrderRepository {
     }
 
     @Override
-    public List<ProductOrder> readAll(long orderId) {
+    public ProductOrderList readAll(long orderId) {
         String query = """
-                select * from product as pr
-                join product_order as pr_or on pr.id = pr_or.product_id
-                join orders o on o.id = pr_or.order_id
+                select pro_ord.id, order_id, product_id, category, type, count, pro.price, pro_ord.price from product as pro
+                join product_order as pro_ord on pro.id = pro_ord.product_id
+                join orders as ord on ord.id = pro_ord.order_id
                 where order_id = ?;
                 """;
-        List<ProductOrder> products = new ArrayList<>();
+        ProductOrderList products = new ProductOrderList();
         try (PreparedStatement ps = DbConfig.getConnection().prepareStatement(query)) {
             ps.setLong(1, orderId);
             ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                ProductOrder productOrder = new ProductOrder(rs.getLong("pr_or.id"),
-                        rs.getLong("order_id"),
-                        rs.getLong("product_id"));
-                productOrder.setCategory(rs.getString("category"));
-                productOrder.setType(rs.getString("type"));
-                productOrder.setCount(rs.getInt("count"));
-                if (rs.getString("status").equals("PENDING"))
-                    productOrder.setCount(rs.getInt("pr.price"));//If order is pending, set the current product price.
-                else productOrder.setCount(rs.getInt("pr_or.price"));//Else set the buying price.
-                products.add(productOrder);
-            }
+            while (rs.next())
+                products.add(getProductOrder(rs));
+
             rs.close();
         } catch (SQLException e) {
-
+            throw new NotFoundException("this order not found.");
         }
+        if (products.isEmpty())
+            throw new NotFoundException("Not found any product in this order!");
         return products;
+    }
+
+    private ProductOrder getProductOrder(ResultSet rs) throws SQLException {
+        return new ProductOrder(rs.getLong(1),
+                rs.getLong(2),
+                rs.getLong(3),
+                rs.getString(4),
+                rs.getString(5),
+                rs.getInt(6),
+                rs.getString("status").equals("PENDING") ?
+                        rs.getInt(7) : //If order is pending to pay, set the current product price.
+                        rs.getInt(8)); //Else set the buy price.
+
     }
 
     public long getLastGeneratedId() {

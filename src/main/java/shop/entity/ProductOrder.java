@@ -7,14 +7,18 @@ public class ProductOrder {
     private long productId;
     private String category;
     private String type;
-    private int price;
     private int count;
+    private int price;
 
     public ProductOrder() {}
-    public ProductOrder(long id, long orderId, long productId) {
+    public ProductOrder(long id, long orderId, long productId, String category, String type, int count, int price) {
         this.id = id;
         this.orderId = orderId;
         this.productId = productId;
+        this.category = category;
+        this.type = type;
+        this.count = count;
+        this.price = price;
     }
 
     public long getId() {

@@ -22,9 +22,9 @@ public class OrderRepositoryImpl implements OrderRepository {
         try (PreparedStatement ps = DbConfig.getConnection().prepareStatement(query)) {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
-            return setOrder(rs);
+            return getOrder(rs);
         } catch (SQLException e) {
-            throw new NotFoundException("Order not found");
+            throw new NotFoundException("Order not found",e);
         }
     }
 
@@ -87,7 +87,7 @@ public class OrderRepositoryImpl implements OrderRepository {
         return null;
     }
 
-    private Order setOrder(ResultSet rs) throws SQLException {
+    private Order getOrder(ResultSet rs) throws SQLException {
         return new Order(rs.getLong("id"),
                 rs.getInt("total_price"),
                 rs.getLong("customer_id"));

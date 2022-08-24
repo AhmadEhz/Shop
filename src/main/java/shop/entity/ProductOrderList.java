@@ -3,9 +3,10 @@ package shop.entity;
 
 import java.util.ArrayList;
 
-public class ProductOrderList extends ArrayList<Product> {
-    public boolean add(Product product) {
-        //todo : check quantity, the add this product to ProductList
+public class ProductOrderList extends ArrayList<ProductOrder> {
+    @Override
+    public boolean add(ProductOrder product) {
+        //todo : check quantity, then add this product to ProductList
         return true;
     }
 }

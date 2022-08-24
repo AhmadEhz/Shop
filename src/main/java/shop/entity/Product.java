@@ -6,14 +6,25 @@ public class Product {
     private String category;
     private String type;
 
-    private int count;
+    private int quantity;
     private boolean isExist;
     private int price;
 
+    public Product() {}
     public Product(long id, String name, String category) {
         this.id = id;
         this.name = name;
         this.category = category;
+    }
+
+    public Product(long id, String name, String category, String type, int quantity, boolean isExist, int price) {
+        this.id = id;
+        this.name = name;
+        this.category = category;
+        this.type = type;
+        this.quantity = quantity;
+        this.isExist = isExist;
+        this.price = price;
     }
 
     public long getId() {
@@ -48,12 +59,12 @@ public class Product {
         this.price = price;
     }
 
-    public int getCount() {
-        return count;
+    public int getQuantity() {
+        return quantity;
     }
 
-    public void setCount(int count) {
-        this.count = count;
+    public void setQuantity(int quantity) {
+        this.quantity = quantity;
     }
 
     public boolean isExist() {

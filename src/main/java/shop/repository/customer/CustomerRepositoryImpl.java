@@ -37,9 +37,9 @@ public class CustomerRepositoryImpl implements CustomerRepository {
                 values (?,?,?)
                 """;
         try (PreparedStatement ps = DbConfig.getConnection().prepareStatement(query)) {
-            ps.setString(1,customer.getName());
-            ps.setString(2,customer.getUsername());
-            ps.setString(3,customer.getPassword());
+            ps.setString(1, customer.getName());
+            ps.setString(2, customer.getUsername());
+            ps.setString(3, customer.getPassword());
             ps.execute();
         } catch (SQLException e) {
             throw new RuntimeException("Can't create customer.");
@@ -53,12 +53,11 @@ public class CustomerRepositoryImpl implements CustomerRepository {
                 set name = ? , username = ? , password = ?
                 """;
         try (PreparedStatement ps = DbConfig.getConnection().prepareStatement(query)) {
-            ps.setString(1,customer.getName());
-            ps.setString(2,customer.getUsername());
-            ps.setString(3,customer.getPassword());
+            ps.setString(1, customer.getName());
+            ps.setString(2, customer.getUsername());
+            ps.setString(3, customer.getPassword());
             ps.execute();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException("can't update customer.");
         }
     }
@@ -70,13 +69,26 @@ public class CustomerRepositoryImpl implements CustomerRepository {
                 where id = ? and username = ? and password = ?
                 """;
         try (PreparedStatement ps = DbConfig.getConnection().prepareStatement(query)) {
-            ps.setLong(1,customer.getId());
-            ps.setString(2,customer.getUsername());
-            ps.setString(3,customer.getPassword());
+            ps.setLong(1, customer.getId());
+            ps.setString(2, customer.getUsername());
+            ps.setString(3, customer.getPassword());
             ps.execute();
-        }
-        catch (SQLException e) {
+        } catch (SQLException e) {
             throw new RuntimeException("can't delete customer.");
+        }
+    }
+
+    public boolean checkUsername(String username) {
+        String query = """
+                select id from customer
+                where username = ?
+                """;
+        try (PreparedStatement ps = DbConfig.getConnection().prepareStatement(query)) {
+            ps.setString(1, username);
+            ResultSet rs = ps.executeQuery();
+            return rs.next();
+        } catch (SQLException e) {
+            throw new RuntimeException("Can't read from Costumer", e.getCause());
         }
     }
 }

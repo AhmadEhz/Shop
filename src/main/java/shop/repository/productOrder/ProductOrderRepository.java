@@ -2,11 +2,13 @@ package shop.repository.productOrder;
 
 import shop.entity.Product;
 import shop.entity.ProductOrder;
+import shop.entity.ProductOrderList;
 import shop.repository.BaseRepository;
 
 import java.util.List;
 
-public interface ProductOrderRepository extends BaseRepository<ProductOrder, Long> {
+public interface ProductOrderRepository extends BaseRepository<ProductOrder, ProductOrder> {
 
-    List<ProductOrder> readAll(long orderId);
+    ProductOrderList readAll(long orderId);
+    long getLastGeneratedId();
 }
